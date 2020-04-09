@@ -1,0 +1,7 @@
+MODULES_MANAGER_V2
+AUgosu|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\AUgosu.py
+Appextgosu|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\Appextgosu.py
+cast_upgrade_1_6_5|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\cast_upgrade_1_6_5.py
+tests.__init__|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\tests\__init__.py
+tests.test_analysis_level|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\tests\test_analysis_level.py
+tests.test_application_level|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\tests\test_application_level.py

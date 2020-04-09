@@ -1,0 +1,184 @@
+import cast.analysers.ua
+from cast.analysers import log as Print, CustomObject
+from cast.application import ApplicationLevelExtension, create_link,  ReferenceFinder
+import re
+import os
+import random
+from pathlib import Path
+import subprocess, sys
+
+
+
+
+
+class gosulintExtension(cast.analysers.ua.Extension):
+    
+    def _init_(self):
+        self.filename = ""
+        self.package = ""
+        self.classname = ""
+        self.file = ""    
+        self.initial_crc =  None
+        self.file_ref=""
+        self.extnls=[]
+        self.parentOBJ=None
+        self.parentOBJtwo=None
+        self.counter = ""
+        return
+
+    def start_analysis(self):
+        Print.info("gosu : Running extension code start")
+        self.parentOBJ=None
+        self.parentOBJtwo=None
+        self.counter = 0
+      
+    
+    def start_file(self,file):
+        Print.info("gosu : Running extension code start file")
+        self.file = file
+        self.filename = file.get_path()
+        if file.get_name().endswith('.gs'):
+            Print.info('Scanning gs  file :'+str(Path(file.get_path()).name))
+            if (os.path.isfile(file.get_path())):
+                self.parsegosupackage(file.get_path(), file);
+                self.parsegosuuses(file.get_path(), file);
+                self.parsegosuclass(file.get_path(), file);
+                self.parsegosuinterface(file.get_path(), file);
+               
+             
+              
+    
+    def parsegosupackage(self, gosufile, file): 
+        try :
+            #Print.info("file scan package :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('packageexport', before='', element = 'package.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('package') is not -1:
+                        response = ref.value.replace("package", '"')
+                        gsobj = cast.analysers.CustomObject()
+                        gsobj.set_name(str(response.strip()))
+                        self.package =str(response.strip())
+                        gsobj.set_type('gosu_package')
+                        gsobj.set_parent(file)
+                        parentFile = file.get_position().get_file() 
+                        self.fielPath = parentFile.get_fullname()
+                        gsobj.set_guid(self.fielPath+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                        gsobj.save()
+                        self.parentOBJ = gsobj
+                        Print.info("Save object package:"+response.strip())
+                     
+                except ValueError:
+                    Print.info ("error loading gosu2 package")
+        except:
+            return          
+    
+    def parsegosuuses(self, gosufile, file): 
+        try :
+            #Print.info("file scan uses "+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('usesexport', before='', element = 'uses.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('uses') is not -1:
+                        response = ref.value.replace("uses", '')
+                        gsobj = cast.analysers.CustomObject()
+                        cleanvalue= re.sub('[^0-9a-zA-Z.]+', '', response)
+                        gsobj.set_name(str(response.strip()))
+                        gsobj.set_type('gosu_uses')
+                        gsobj.set_parent(file)
+                        parentFile = file.get_position().get_file() 
+                        self.fielPath = parentFile.get_fullname()
+                        gsobj.set_guid(response+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                        gsobj.save()
+                        bookmark = cast.analysers.Bookmark(file, 1,1,-1,-1)
+                        gsobj.save_position(bookmark)
+                        Print.info("Save object uses: "+cleanvalue)
+                        cast.analysers.create_link('callLink', self.parentOBJ,gsobj, bookmark)
+                        #Print.info("link created: "+cleanvalue)
+                 
+                             
+                except ValueError:
+                    Print.info ("error loading gosu2 uses")
+        except:
+            return   
+     
+                
+    def parsegosuclass(self, gosufile, file): 
+        try :
+            #Print.info("file scan class :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('classexportp', before='public', element = 'class.*', after='\{')
+            rf.add_pattern('classexportc', before='', element = 'class.*', after='\{')
+            rf.add_pattern('classexporta', before='abstract', element = 'class.*', after='\{')
+            #rf.add_pattern('classexportp', before='', element = 'class.*', after='\{')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                try:
+                    if ref.value.find('class') is not -1:
+                                response = ref.value
+                                resp = response.replace("class", '')
+                                self.counter = self.counter+1
+                                gsobj = cast.analysers.CustomObject()
+                                cleanvalue= re.sub('[^0-9a-zA-Z.]+', ' ', resp)
+                                Print.info ("inside class3" + cleanvalue)
+                                gsobj.set_name(str(cleanvalue))
+                                self.classname =str(resp.strip())
+                                gsobj.set_type('gosu_class')
+                                gsobj.set_parent(file)
+                                parentFile = file.get_position().get_file() 
+                                self.fielPath = parentFile.get_fullname()
+                                gsobj.set_guid(str(Path(file.get_path()).name)+str(self.counter))
+                                gsobj.save()
+                                bookmark = cast.analysers.Bookmark(file, 1,1,-1,-1)
+                                gsobj.save_position(bookmark)
+                                Print.info("Save object class: "+cleanvalue)
+                                self.parentOBJtwo =gsobj
+                                cast.analysers.create_link('callLink',  self.parentOBJ, gsobj, bookmark)
+                                #Print.info("link created: "+cleanvalue)
+                except ValueError:
+                    Print.info ("error loading gosu2 class")
+        except:
+            return 
+        
+    def parsegosuinterface(self, gosufile, file): 
+        try :
+            #Print.info("file scan class :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('interfaceexportc', before='', element = 'interface.*', after='\{')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                try:
+                    if ref.value.find('interface') is not -1:
+                                response = ref.value
+                                resp = response.replace("interface", '')
+                                self.counter = self.counter+1
+                                gsobj = cast.analysers.CustomObject()
+                                cleanvalue= re.sub('[^0-9a-zA-Z.]+', ' ', resp)
+                                gsobj.set_name(str(cleanvalue))
+                                self.classname =str(resp.strip())
+                                gsobj.set_type('gosu_interface')
+                                gsobj.set_parent(file)
+                                parentFile = file.get_position().get_file() 
+                                self.fielPath = parentFile.get_fullname()
+                                gsobj.set_guid(str(Path(file.get_path()).name)+str(self.counter))
+                                gsobj.save()
+                                bookmark = cast.analysers.Bookmark(file, 1,1,-1,-1)
+                                gsobj.save_position(bookmark)
+                                Print.info("Save object interface: "+cleanvalue)
+                                self.parentOBJtwo =gsobj
+                                cast.analysers.create_link('callLink',  self.parentOBJ, gsobj, bookmark)
+                                #Print.info("link created: "+cleanvalue)
+                except ValueError:
+                    Print.info ("error loading gosu2 class")
+        except:
+            return                   

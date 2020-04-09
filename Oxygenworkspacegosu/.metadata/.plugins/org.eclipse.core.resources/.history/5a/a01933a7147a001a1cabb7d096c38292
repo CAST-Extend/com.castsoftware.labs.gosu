@@ -1,0 +1,218 @@
+import cast.analysers.ua
+from cast.analysers import log as Print, CustomObject
+from cast.application import ApplicationLevelExtension, create_link,  ReferenceFinder
+import re
+import os
+import random
+from pathlib import Path
+import subprocess, sys
+
+
+
+
+
+class gosulintExtension(cast.analysers.ua.Extension):
+    
+    def _init_(self):
+        self.filename = ""
+        self.package = ""
+        self.modulename = ""
+        self.file = ""    
+        self.initial_crc =  None
+        self.file_ref=""
+        self.extnls=[]
+        self.counter = 0
+        return
+
+    def start_analysis(self):
+        Print.info("gosu : Running extension code start")
+      
+    
+    def start_file(self,file):
+        Print.info("gosu : Running extension code start file")
+        self.file = file
+        self.filename = file.get_path()
+        if file.get_name().endswith('.gs'):
+            Print.info('Scanning gs  file :'+str(Path(file.get_path()).name))
+            if (os.path.isfile(file.get_path())):
+                self.parsegosunamespace(file.get_path(), file);
+                self.parsegosumodule(file.get_path(), file);
+                self.parsegosutype(file.get_path(), file);
+                self.parsegosulet(file.get_path(), file);
+                self.parsegosuopen(file.get_path(), file);
+             
+              
+              
+              
+    def parsegosumodule(self, gosufile, file): 
+        try :
+            Print.info("file scan module :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('moduleexport', before='', element = 'module.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('module') is not -1:
+                        if ref.value.find('=') is not -1: 
+                                response = ref.value.replace("=", '"')
+                                resp = response.replace("module", '"')
+                                fsobj = cast.analysers.CustomObject()
+                                fsobj.set_name(str(resp.strip()))
+                                self.modulename =str(resp.strip())
+                                fsobj.set_type('gosu_module')
+                                fsobj.set_parent(file)
+                                parentFile = file.get_position().get_file() 
+                                self.fielPath = parentFile.get_fullname()
+                                fsobj.set_guid(self.fielPath+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                                fsobj.save()
+                                setpropertyparent.add_propertynamespace(fsobj,  self.package)
+                                Print.info("Save object module:"+resp.strip())
+                             
+                except ValueError:
+                    Print.info ("error loading gosu2 module")
+        except:
+            return          
+    
+    def parsegosunamespace(self, gosufile, file): 
+        try :
+            Print.info("file scan package :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('namespaceexport', before='', element = 'package.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('package') is not -1:
+                        response = ref.value.replace("package", '"')
+                        fsobj = cast.analysers.CustomObject()
+                        fsobj.set_name(str(response.strip()))
+                        self.package =str(response.strip())
+                        fsobj.set_type('gosu_namespace')
+                        fsobj.set_parent(file)
+                        parentFile = file.get_position().get_file() 
+                        self.fielPath = parentFile.get_fullname()
+                        fsobj.set_guid(self.fielPath+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                        fsobj.save()
+                        Print.info("Save object package:"+response.strip())
+                     
+                except ValueError:
+                    Print.info ("error loading gosu2 package")
+        except:
+            return          
+        
+    def parsegosutype(self, gosufile, file): 
+        try :
+            Print.info("file scan type :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('typeexport', before='', element = 'type.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('type') is not -1:
+                        if ref.value.find('=') is not -1: 
+                                response = ref.value.replace("=", '"')
+                                resp = response.replace("type", '"')
+                                fsobj = cast.analysers.CustomObject()
+                                fsobj.set_name(str(resp.strip()))
+                                fsobj.set_type('gosu_type')
+                                fsobj.set_parent(file)
+                                parentFile = file.get_position().get_file() 
+                                self.fielPath = parentFile.get_fullname()
+                                fsobj.set_guid(self.fielPath+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                                fsobj.save()
+                                setpropertyparent.add_propertynamespace(fsobj,  self.package)
+                                Print.info("Save object type:"+resp.strip())
+                             
+                except ValueError:
+                    Print.info ("error loading gosu2 type")
+        except:
+            return          
+        
+    def parsegosulet(self, gosufile, file): 
+        try :
+            Print.info("file scan let :"+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('letexport', before='', element = 'let.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('let') is not -1:
+                                response = ref.value.replace("=", '"')
+                                resp = response.replace("let", '"')
+                                fsobj = cast.analysers.CustomObject()
+                                fsobj.set_name(str(resp.strip()))
+                                fsobj.set_type('gosu_let')
+                                fsobj.set_parent(file)
+                                parentFile = file.get_position().get_file() 
+                                self.fielPath = parentFile.get_fullname()
+                                fsobj.set_guid(resp+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                                fsobj.save()
+                                setpropertyparent.add_propertynamespace(fsobj,  self.package)
+                                setpropertyparent.add_propertymodule(fsobj,  self.modulename)
+                                #Print.info("Save object let:"+resp.strip())
+                             
+                except ValueError:
+                    Print.info ("error loading gosu2 let")
+        except:
+            return
+        
+    def parsegosuopen(self, gosufile, file): 
+        try :
+            Print.info("file scan open "+Path(file.get_path()).name)
+            rf = ReferenceFinder()
+            greferences = []
+            rf.add_pattern('openexport', before='', element = 'open.*', after='')
+            greferences += [reference for reference in rf.find_references_in_file(gosufile)]
+            for ref in greferences:
+                
+                try:
+                    if ref.value.find('open') is not -1:
+                        response = ref.value.replace("open", '"')
+                        fsobj = cast.analysers.CustomObject()
+                        fsobj.set_name(str(response.strip()))
+                        fsobj.set_type('gosu_open')
+                        fsobj.set_parent(file)
+                        parentFile = file.get_position().get_file() 
+                        self.fielPath = parentFile.get_fullname()
+                        fsobj.set_guid(response+str(Path(file.get_path()).name)+str(random.randint(1, 200))+str(random.randint(1, 200)))
+                        fsobj.save()
+                        setpropertyparent.add_propertynamespace(fsobj,  self.package)
+                        Print.info("Save object open:"+response.strip())
+                 
+                             
+                except ValueError:
+                    Print.info ("error loading gosu2 open")
+        except:
+            return          
+     
+    def end_analysis(self):
+        Print.info("gosu : Running extension code end") 
+       
+        pass
+
+
+
+class setpropertyparent():  
+    
+    @staticmethod
+    def add_propertynamespace(obj, ctx ):
+        if ctx is not None:
+            obj.save_property('parentnamespaceProperties.gosuparent', str(ctx))
+            #Print.info("namesp:"+ str(ctx))
+        else:
+            obj.save_property('parentnamespaceProperties.gosuparent', 'None')
+         
+    @staticmethod
+    def add_propertymodule(obj, ctx ):
+        if ctx is not None:
+            obj.save_property('parentmoduleProperties.gosuparentmodule', str(ctx))
+            #Print.info("modulep:"+ str(ctx))
+        else:
+            obj.save_property('parentmoduleProperties.gosuparentmodule', 'None')

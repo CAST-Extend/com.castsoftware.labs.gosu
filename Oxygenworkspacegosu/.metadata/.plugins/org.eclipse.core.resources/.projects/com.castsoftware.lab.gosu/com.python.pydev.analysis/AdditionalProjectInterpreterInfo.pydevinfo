@@ -1,0 +1,60 @@
+-- VERSION_4
+-- START DISKCACHE_2
+C:\Oxygenworkspacegosu\.metadata\.plugins\org.eclipse.core.resources\.projects\com.castsoftware.lab.gosu\com.python.pydev.analysis\v2_indexcache
+cast_upgrade_1_6_5|1586403683630479000|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\cast_upgrade_1_6_5.py
+AUgosu|1586417283792014000|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\AUgosu.py
+tests.test_analysis_level|1586417591043652000|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\tests\test_analysis_level.py
+Appextgosu|1586417566109968000|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\Appextgosu.py
+tests.test_application_level|1586399481446275000|C:\Oxygenworkspacegosu\com.castsoftware.lab.gosu\tests\test_application_level.py
+-- END DISKCACHE
+-- START DICTIONARY
+20
+10=gosulintExtension.parsegosuinterface
+17=gosulintExtension.parsegosuuses
+18=gosulintExtension.start_file
+14=gosulintExtension.parsegosuvar
+1=Appextgosu
+8=gosulintExtension._init_
+20=TestIntegration
+11=gosulintExtension.parsegosufunction
+3=cast_upgrade_1_6_5
+19=Test
+7=gosulintExtension
+2=AUgosu
+12=gosulintExtension.parsegosumethod
+15=gosulintExtension.start_analysis
+16=gosulintExtension.parsegosupackage
+6=gosuExtensionApplication
+9=gosulintExtension.parsegosuclass
+4=tests.test_analysis_level
+5=tests.test_application_level
+13=gosulintExtension.parsegosuproperty
+-- END DICTIONARY
+-- START TREE 1
+6
+fsh|0|
+gos|2|gosuExtensionApplication!9@gosulintExtension!17@
+pat|1|path!27@
+sav|1|saved_path!27@
+set|0|
+tes|2|Test!33@TestIntegration!41@
+-- END TREE
+-- START TREE 2
+16
+__i|1|__init__!6&10@
+_in|1|_init_!7&18@
+add|0|
+cla|7|classname!8&19@classname!9&19@classname!10&19@classname!11&19@classname!12&19@classname!13&19@classname!14&19@
+cou|8|counter!8&19@counter!15&19@counter!9&19@counter!10&19@counter!11&19@counter!12&19@counter!13&19@counter!14&19@
+end|2|end_analysis!7&18@end_application!6&10@
+ext|1|extnls!8&19@
+fie|8|fielPath!16&19@fielPath!17&19@fielPath!9&19@fielPath!10&19@fielPath!11&19@fielPath!12&19@fielPath!13&19@fielPath!14&19@
+fil|5|filename!8&19@filename!18&19@file!8&19@file!18&19@file_ref!8&19@
+ini|1|initial_crc!8&19@
+mod|0|
+nam|0|
+pac|2|package!8&19@package!16&19@
+par|15|parsegosufunction!7&18@parsegosuproperty!7&18@parsegosumethod!7&18@parsegosupackage!7&18@parsegosuuses!7&18@parsegosuinterface!7&18@parsegosuclass!7&18@parsegosuvar!7&18@parentOBJtwo!8&19@parentOBJtwo!15&19@parentOBJtwo!9&19@parentOBJtwo!10&19@parentOBJ!8&19@parentOBJ!15&19@parentOBJ!16&19@
+sta|2|start_file!7&18@start_analysis!7&18@
+tes|2|testName!19&34@test2!20&42@
+-- END TREE
